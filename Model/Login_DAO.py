@@ -1,17 +1,13 @@
 class login:
-    def __init__ (self, username, password, safetyphrase):
-        username = ""
-        password = ""
-        safetyphrase = ""
+    def __init__ (self):
+        self.username
+        self.password
+        self.safetyphrase
         
-    def setLogin (self, x, y, z):
-        global username
-        global password
-        global safetyphrase
-        
-        username = x
-        password = y
-        safetyphrase = z
+    def setLogin (self, username, password, safetyphrase):
+        self.username = username
+        self.password = password
+        self.safetyphrase = safetyphrase
     
     def login (self, x, y):
         global username

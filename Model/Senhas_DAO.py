@@ -1,24 +1,27 @@
 class managePasswords:
-    def __init__(self):
+    #Instale o conector de MySQL x Python ( pip install mysql-connector-python ) 
+    import 
+    
+    def __init__(self, username, password, email, nome, url):
         self.username = username
         self.password = password
         self.email = email
         self.nome = nome
         self.url = url
     
-    def insertPassword (self, w, x, y, z):
-        username = w
-        password = x
-        nome = y
-        url = z
+    def insertAccount (self, w, x, y, z):
+        self.username = w
+        self.password = x
+        self.nome = y
+        self.url = z
         
     def changePassword (self, w, x, y, z):
-        username = w
-        password = x
-        nome = y
-        url = z
+        self.username = w
+        self.password = x
+        self.nome = y
+        self.url = z
         
-    def deletePassword (self):
+    def deletePassword (self, w, x, y, z):
         global username
         global password
         global nome
