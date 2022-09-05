@@ -1,27 +1,18 @@
 class managePasswords:
     def __init__(self):
-        username = ""
-        password = ""
-        nome = ""
-        url = ""
+        self.username = username
+        self.password = password
+        self.email = email
+        self.nome = nome
+        self.url = url
     
     def insertPassword (self, w, x, y, z):
-        global username
-        global password
-        global nome
-        global url
-        
         username = w
         password = x
         nome = y
         url = z
         
-    def chagePassword (self, w, x, y, z):
-        global username
-        global password
-        global nome
-        global url
-        
+    def changePassword (self, w, x, y, z):
         username = w
         password = x
         nome = y
