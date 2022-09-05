@@ -3,6 +3,7 @@
 ## Aplicação para gerenciar senhas 
 #### (feito em Python)
 
+## Explicação do projeto
 ### Essa aplicação foi feita com o intuito de criar uma aplicação python que possa gerenciar senhas para pessoal
 
 ## Metas
