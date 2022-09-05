@@ -1,7 +1,6 @@
 # RemindPassword
 
-## Aplicação para gerenciar senhas
-### (feito em Python)
+## Aplicação para gerenciar senhas #### (feito em Python)
 
 ### Essa aplicação foi feita com o intuito de criar uma aplicação python que possa gerenciar senhas para pessoal
 
