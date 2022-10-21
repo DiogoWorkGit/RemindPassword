@@ -9,6 +9,7 @@ def atualizar_sql(cursor):
     sql = f'SELECT * FROM gensen;'
     cursor.execute(sql)
     resultset = cursor.fetchall()
+    print(resultset)
     result=[]
     for i in range(len(resultset)):
         x = str(resultset[i])
@@ -24,7 +25,12 @@ def insert_sql(cursor, conexao, user, senha, email, siteapp, nome, url, data):
         msg = f"{cursor.rowcount} colunas afetadas"
     except:
         msg = "O banco de dados encontrou um erro ao inserir os valores"
-    return msg
+    sg.popup_auto_close(msg,
+                                    no_titlebar=True,
+                                    auto_close=True,
+                                    auto_close_duration=4,
+                                    grab_anywhere=True)
+    atualizar_sql(cursor)
     
 def alter_sql(cursor, conexao, id, user, senha, email, siteapp, nome, url):
     sql = f'UPDATE gensen SET usuario = "{user}", pass = "{senha}", email = "{email}", tipo = "{siteapp}", nome = "{nome}", url = "{url}" WHERE id = {id})'
@@ -34,6 +40,11 @@ def alter_sql(cursor, conexao, id, user, senha, email, siteapp, nome, url):
         msg = f"{cursor.rowcount} colunas afetadas"
     except:
         msg = "O banco de dados encontrou um erro ao tentar alterar os valores"
+    sg.popup_auto_close(msg,
+                                    no_titlebar=True,
+                                    auto_close=True,
+                                    auto_close_duration=4,
+                                    grab_anywhere=True)
     return msg
 
 def delet_sql(id):
@@ -44,6 +55,11 @@ def delet_sql(id):
         msg = f"{cursor.rowcount} colunas deletadas"
     except:
         msg = "O banco de dados encontrou um erro ao tentar deletar os valores"
+    sg.popup_auto_close(msg,
+                                    no_titlebar=True,
+                                    auto_close=True,
+                                    auto_close_duration=4,
+                                    grab_anywhere=True)
     return msg
 
 def vefNull(user, senha, nome):
@@ -70,7 +86,7 @@ def inserir():
         [sg.Text("A conta é para um site ou aplicativo"), sg.Text("(*Campo obrigatório)")], [sg.Radio("Site", group_id=(1), key="Site", default=True),sg.Radio("Aplicativo", group_id=(1), key="App")],
         [sg.Text("Nome do site ou do app"), sg.Text("(*Campo obrigatório)")], [sg.InputText(key="nome")],
         [sg.Text("Qual o url")], [sg.InputText(key="Url")],
-        [sg.Button("Registrar", key="Regis")], [sg.Text(f"{sucesso}")],
+        [sg.Button("Registrar", key="Regis")],
         ]
     janela = sg.Window("GERENCIADOR DE SENHAS",
                        layout)
@@ -90,6 +106,11 @@ def inserir():
             
             mensagem = vefNull(usuario, senha, nome)
             if mensagem != "Campos não preenchidos:":
+                sg.popup_auto_close(mensagem,
+                                    no_titlebar=True,
+                                    auto_close=True,
+                                    auto_close_duration=4,
+                                    grab_anywhere=True)
                 continue
             sucesso = insert_sql(cursor, conexao, usuario, senha, email, tipo, nome, url, data)
         
@@ -99,11 +120,13 @@ def inserir():
 
 def main():
     lista = atualizar_sql(cursor)
-    hlis = ["id", "Usuário", "Senha", "Email", "Site ou App", "Nome", "URL", "Data de Criação"]
+    hlis = ["ID", "USUÁRIO", "SENHA", "EMAIL", "ONDE", "NOME", "URL", "DATA DE CRIAÇÃO"]
     layout = [
         [sg.Table(
             lista,
-            headings=hlis)],
+            headings=hlis,
+            col_widths=[3, 10, 10, 30, 6, 10, 10,21],
+            auto_size_columns=False)],
         
         [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo"),
          sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo"),
@@ -122,6 +145,8 @@ def main():
         if evento == sg.WIN_CLOSED:
             break
 
+
+#Inicio do código
 conexao = mysql.connector.connect(
     host='localhost',
     user='root',
@@ -134,3 +159,4 @@ main()
         
 cursor.close()
 conexao.close()
+#Término
