@@ -138,6 +138,47 @@ def inserir():
         if evento == sg.WIN_CLOSED:
             break
 
+def alterar():
+    layout = [
+        #, sg.Button("Consultar o ID", key="Consultar",font=("Avantgarde",15) ,pad=((0,0),(0,30)))
+        [sg.Text("Verificar o ID", font=("Courier New",15)),
+         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="id", font=("Courier New",15) ,pad=((0,0),(0,30)), size=10), sg.Button("Consultar o ID", key="Consultar",font=("Avantgarde",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Alterar o usuário", font=("Courier New",15)),
+         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="user", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Alterar a senha da conta", font=("Courier New",15)),
+         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="userPass", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Alterar o email usado no cadastro", font=("Courier New",15))],
+        [sg.InputText(key="userEmail", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("A conta é para um site ou aplicativo", font=("Courier New",15))],
+        [sg.Radio("Site", group_id=(1), key="Site", font=("Courier New",15, ["bold"])),
+         sg.Radio("Aplicativo", group_id=(1), key="App", font=("Courier New",15, ["bold"])),
+         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Alterar nome do site ou do app", font=("Courier New",15)),
+         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="nome", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Alterar o url", font=("Courier New",15))],
+        [sg.InputText(key="Url", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Button("REGISTRAR PERFIL", key="Regis", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
+        ]
+    janela = sg.Window("GERENCIADOR DE SENHAS",
+                       layout)
+    while True:
+        evento, valores = janela.read()
+        
+        
+        if evento == sg.WIN_CLOSED:
+            break
+
 def main():
     lista = atualizar_sql(cursor)
     hlis = ["ID", "USUÁRIO", "SENHA", "EMAIL", "ONDE", "NOME", "URL", "DATA DE CRIAÇÃO"]
@@ -145,16 +186,18 @@ def main():
         [sg.Table(
             lista,
             headings=hlis,
-            col_widths=[3, 10, 10, 20, 6, 10, 10, 17],
+            col_widths=[3, 10, 15, 20, 6, 10, 10, 17],
             auto_size_columns=False,
             font=("Verdana",13),
+            header_font=("Verdana",13, ["bold"]),
             row_height=35,
+            alternating_row_color = "",
             key="Tabela")
             ],
         
-        [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo", font=("Avantgarde",15), size=30),
-         sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo", font=("Avantgarde",15), size=30),
-         sg.Button("DELETAR UM PERFIL", key="delInfo",font=("Avantgarde",15), size=25)]
+        [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo", font=("Avantgarde",15, ["bold"]), size=30),
+         sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo", font=("Avantgarde",15, ["bold"]), size=30),
+         sg.Button("DELETAR UM PERFIL", key="delInfo",font=("Avantgarde",15, ["bold"]), size=25)]
     ]
     
     janela = sg.Window("GERENCIADOR DE SENHAS",
@@ -169,10 +212,12 @@ def main():
             janela.hide()
             inserir()
             lista = atualizar_sql(cursor)
+            janela["Tabela"].update(lista)
             janela._Show()
         
-            
-        janela["Tabela"].update(lista)
+        if evento == "attInfo":
+            alterar()
+        
         if evento == sg.WIN_CLOSED:
             break
 
