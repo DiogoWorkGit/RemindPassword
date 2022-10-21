@@ -1,6 +1,8 @@
 #pip install PySimpleGUI
 #pip install mysql-connector-python
 
+from email.policy import default
+from termios import VLNEXT
 import PySimpleGUI as sg
 import mysql.connector
 from datetime import datetime
@@ -21,6 +23,23 @@ def atualizar_sql(cursor):
         result = []
     return finalresult
 
+def buscarId_sql(cursor, id):
+    sql = f'SELECT usuario, pass, email, nome, url FROM gensen WHERE id = {id};'
+    try:
+        cursor.execute(sql)
+        resultset = cursor.fetchone()
+        finalresult = []
+        for y in range(len(resultset)):
+            x = str(resultset[y])
+            x = x.replace(")","").replace("(","").replace(",","").replace("'","")
+            finalresult.append(x)
+        return finalresult
+    except:
+        sg.popup("O id não foi encontrado no banco de dados",
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
+
 def insert_sql(cursor, conexao, user, senha, email, siteapp, nome, url, data):
     sql = f'INSERT INTO gensen (usuario, pass, email, tipo, nome, url, data_creation) VALUES ("{user}", "{senha}", "{email}", "{siteapp}", "{nome}", "{url}", "{data}");'
     try:
@@ -35,8 +54,8 @@ def insert_sql(cursor, conexao, user, senha, email, siteapp, nome, url, data):
         font=("Courier New",15))
     atualizar_sql(cursor)
     
-def alter_sql(cursor, conexao, id, user, senha, email, siteapp, nome, url):
-    sql = f'UPDATE gensen SET usuario = "{user}", pass = "{senha}", email = "{email}", tipo = "{siteapp}", nome = "{nome}", url = "{url}" WHERE id = {id})'
+def alter_sql(cursor, conexao, id, user, senha, email, nome, url):
+    sql = f'UPDATE gensen SET usuario = "{user}", pass = "{senha}", email = "{email}", nome = "{nome}", url = "{url}" WHERE id = {id}'
     try:
         cursor.execute(sql)
         conexao.commit()
@@ -63,16 +82,26 @@ def delet_sql(id):
         font=("Courier New",15))
     return msg
 
-def vefNull(user, senha, tipo, nome):
+def vefNullInser(user, senha, tipo, nome):
     mensagem = "Alguns campos não foram preenchidos:"
     if user == "":
-        mensagem = mensagem + "\n  - Qual o usuário da conta"
+        mensagem = mensagem + "\n  - Qual o usuário da conta?"
     if senha == "":
-        mensagem = mensagem + "\n  - Qual a senha da conta"
+        mensagem = mensagem + "\n  - Qual a senha da conta?"
     if tipo == "":
         mensagem = mensagem + "\n  - A conta está em um aplicativo ou em um site?"
     if nome == "":
-        mensagem = mensagem + "\n  - Qual o lugar onde a conta está hospedada"
+        mensagem = mensagem + "\n  - Qual o lugar onde a conta está hospedada?"
+    return mensagem
+
+def vefNullAlter(user, senha, nome):
+    mensagem = "Alguns campos não foram preenchidos:"
+    if user == "":
+        mensagem = mensagem + "\n  - Qual será o novo usuário da conta?"
+    if senha == "":
+        mensagem = mensagem + "\n  - Qual será a nova senha da conta?"
+    if nome == "":
+        mensagem = mensagem + "\n  - Qual o lugar onde a conta está hospedada?"
     return mensagem
 
 def gettime():
@@ -125,7 +154,7 @@ def inserir():
             url = valores["Url"]
             data = gettime()
             
-            mensagem = vefNull(usuario, senha, tipo, nome)
+            mensagem = vefNullInser(usuario, senha, tipo, nome)
             if mensagem != "Alguns campos não foram preenchidos:":
                 sg.popup(mensagem,
                     no_titlebar=True,
@@ -139,42 +168,102 @@ def inserir():
             break
 
 def alterar():
+    usuarioTxt = ""
+    senhaTxt = ""
+    emailTxt = ""
+    nomeTxt = ""
+    urlTxt = ""
+    
     layout = [
-        #, sg.Button("Consultar o ID", key="Consultar",font=("Avantgarde",15) ,pad=((0,0),(0,30)))
+        #Campo referente ao ID do registro
         [sg.Text("Verificar o ID", font=("Courier New",15)),
          sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
         [sg.InputText(key="id", font=("Courier New",15) ,pad=((0,0),(0,30)), size=10), sg.Button("Consultar o ID", key="Consultar",font=("Avantgarde",15) ,pad=((0,0),(0,30)))],
         
+        #Campo referente ao usuário do registro
         [sg.Text("Alterar o usuário", font=("Courier New",15)),
          sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
         [sg.InputText(key="user", font=("Courier New",15) ,pad=((0,0),(0,30)))],
         
+        #Campo referente a senha do registro
         [sg.Text("Alterar a senha da conta", font=("Courier New",15)),
          sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
         [sg.InputText(key="userPass", font=("Courier New",15) ,pad=((0,0),(0,30)))],
         
+        #Campo referente ao email do registro
         [sg.Text("Alterar o email usado no cadastro", font=("Courier New",15))],
         [sg.InputText(key="userEmail", font=("Courier New",15) ,pad=((0,0),(0,30)))],
         
-        [sg.Text("A conta é para um site ou aplicativo", font=("Courier New",15))],
-        [sg.Radio("Site", group_id=(1), key="Site", font=("Courier New",15, ["bold"])),
-         sg.Radio("Aplicativo", group_id=(1), key="App", font=("Courier New",15, ["bold"])),
-         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]) ,pad=((0,0),(0,30)))],
-        
-        [sg.Text("Alterar nome do site ou do app", font=("Courier New",15)),
-         sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
+        #Campo referente ao nome do aplicativo ou site do registro
+        [sg.Text("Alterar nome do site ou do app", font=("Courier New",15))],
+        [sg.Text("*Campo não pode estar em branco*", font=("Courier New",10, ["bold"]))],
         [sg.InputText(key="nome", font=("Courier New",15) ,pad=((0,0),(0,30)))],
         
+        #Campo referente ao url seja de um site do registro
         [sg.Text("Alterar o url", font=("Courier New",15))],
         [sg.InputText(key="Url", font=("Courier New",15) ,pad=((0,0),(0,30)))],
         
-        [sg.Button("REGISTRAR PERFIL", key="Regis", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
+        #Botão para realizar a alteração do registro no banco de dados
+        [sg.Button("ALTERAR REGISTRO DO PERFIL", key="alte", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
         ]
     janela = sg.Window("GERENCIADOR DE SENHAS",
                        layout)
     while True:
         evento, valores = janela.read()
-        
+        if evento == "Consultar":
+            id = valores["id"]
+            try:
+                id = int(id)
+            except:
+                sg.popup("O id não é um número válido",
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
+                continue
+            
+            result = buscarId_sql(cursor, id)
+            if result == None:
+                continue
+            
+            print(result)
+            usuarioTxt = result[0]
+            senhaTxt = result[1]
+            emailTxt = result[2]
+            nomeTxt = result[3]
+            urlTxt = result[4]
+            
+            janela["user"].update(f"{usuarioTxt}")
+            janela["userPass"].update(f"{senhaTxt}")
+            janela["userEmail"].update(f"{emailTxt}")
+            janela["nome"].update(f"{nomeTxt}")
+            janela["Url"].update(f"{urlTxt}")
+            
+        if evento == "alte":
+            usuario = valores["user"]
+            senha = valores["userPass"]
+            email = valores["userEmail"]
+            nome = valores["nome"]
+            url = valores["Url"]
+            
+            mensagem = vefNullAlter(usuario, senha, nome)
+            if mensagem != "Alguns campos não foram preenchidos:":
+                sg.popup(mensagem,
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
+                continue
+            
+            alter_sql(cursor, conexao, id, usuario, senha, email, nome, url)
+            
+            janela["id"].update("")
+            janela["user"].update("")
+            janela["userPass"].update("")
+            janela["userEmail"].update("")
+            janela["nome"].update("")
+            janela["Url"].update("")
+            continue
+            
+            
         
         if evento == sg.WIN_CLOSED:
             break
@@ -216,7 +305,11 @@ def main():
             janela._Show()
         
         if evento == "attInfo":
+            janela.hide()
             alterar()
+            lista = atualizar_sql(cursor)
+            janela["Tabela"].update(lista)
+            janela._Show()
         
         if evento == sg.WIN_CLOSED:
             break
