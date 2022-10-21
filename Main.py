@@ -9,27 +9,30 @@ def atualizar_sql(cursor):
     sql = f'SELECT * FROM gensen;'
     cursor.execute(sql)
     resultset = cursor.fetchall()
-    print(resultset)
     result=[]
+    finalresult = []
     for i in range(len(resultset)):
-        x = str(resultset[i])
-        x = x.replace(")","").replace("(","").replace(",","").replace("'","")
-        result.append(x)
-    return result
+        resultsetpart = resultset[i]
+        for y in range(len(resultsetpart)):
+            x = str(resultsetpart[y])
+            x = x.replace(")","").replace("(","").replace(",","").replace("'","")
+            result.append(x)
+        finalresult.append(result)
+        result = []
+    return finalresult
 
 def insert_sql(cursor, conexao, user, senha, email, siteapp, nome, url, data):
     sql = f'INSERT INTO gensen (usuario, pass, email, tipo, nome, url, data_creation) VALUES ("{user}", "{senha}", "{email}", "{siteapp}", "{nome}", "{url}", "{data}");'
     try:
         cursor.execute(sql)
         conexao.commit()
-        msg = f"{cursor.rowcount} colunas afetadas"
+        msg = "Registro inserido com sucesso"
     except:
         msg = "O banco de dados encontrou um erro ao inserir os valores"
-    sg.popup_auto_close(msg,
-                                    no_titlebar=True,
-                                    auto_close=True,
-                                    auto_close_duration=4,
-                                    grab_anywhere=True)
+    sg.popup(msg,
+        no_titlebar=True,
+        grab_anywhere=True,
+        font=("Courier New",15))
     atualizar_sql(cursor)
     
 def alter_sql(cursor, conexao, id, user, senha, email, siteapp, nome, url):
@@ -37,14 +40,13 @@ def alter_sql(cursor, conexao, id, user, senha, email, siteapp, nome, url):
     try:
         cursor.execute(sql)
         conexao.commit()
-        msg = f"{cursor.rowcount} colunas afetadas"
+        msg = "Registro alterado com sucesso"
     except:
         msg = "O banco de dados encontrou um erro ao tentar alterar os valores"
-    sg.popup_auto_close(msg,
-                                    no_titlebar=True,
-                                    auto_close=True,
-                                    auto_close_duration=4,
-                                    grab_anywhere=True)
+    sg.popup(msg,
+        no_titlebar=True,
+        grab_anywhere=True,
+        font=("Courier New",15))
     return msg
 
 def delet_sql(id):
@@ -52,41 +54,58 @@ def delet_sql(id):
     try:
         cursor.execute(sql)
         conexao.commit()
-        msg = f"{cursor.rowcount} colunas deletadas"
+        msg = "O registro foi deletado com sucesso"
     except:
         msg = "O banco de dados encontrou um erro ao tentar deletar os valores"
-    sg.popup_auto_close(msg,
-                                    no_titlebar=True,
-                                    auto_close=True,
-                                    auto_close_duration=4,
-                                    grab_anywhere=True)
+    sg.popup(msg,
+        no_titlebar=True,
+        grab_anywhere=True,
+        font=("Courier New",15))
     return msg
 
-def vefNull(user, senha, nome):
-    mensagem = "Campos não preenchidos:"
+def vefNull(user, senha, tipo, nome):
+    mensagem = "Alguns campos não foram preenchidos:"
     if user == "":
-        mensagem = mensagem + " Usuário"
+        mensagem = mensagem + "\n  - Qual o usuário da conta"
     if senha == "":
-        mensagem = mensagem + " Senha"
+        mensagem = mensagem + "\n  - Qual a senha da conta"
+    if tipo == "":
+        mensagem = mensagem + "\n  - A conta está em um aplicativo ou em um site?"
     if nome == "":
-        mensagem = mensagem + " Nome"
+        mensagem = mensagem + "\n  - Qual o lugar onde a conta está hospedada"
     return mensagem
 
 def gettime():
     t = datetime.now()
-    time = t.strftime('%d/%m/%Y - %H:%M;%S')
+    time = t.strftime('%d/%m/%Y - %H:%M:%S')
     return time
     
 def inserir():
-    sucesso = ""
     layout = [
-        [sg.Text("Digite o usuário"), sg.Text("(*Campo obrigatório)")], [sg.InputText(key="user")],
-        [sg.Text("Digite a senha da conta"), sg.Text("(*Campo obrigatório)")], [sg.InputText(key="userPass")],
-        [sg.Text("Digite o email usado no cadastro")], [sg.InputText(key="userEmail")],
-        [sg.Text("A conta é para um site ou aplicativo"), sg.Text("(*Campo obrigatório)")], [sg.Radio("Site", group_id=(1), key="Site", default=True),sg.Radio("Aplicativo", group_id=(1), key="App")],
-        [sg.Text("Nome do site ou do app"), sg.Text("(*Campo obrigatório)")], [sg.InputText(key="nome")],
-        [sg.Text("Qual o url")], [sg.InputText(key="Url")],
-        [sg.Button("Registrar", key="Regis")],
+        [sg.Text("Digite o usuário", font=("Courier New",15)),
+         sg.Text("*Campo obrigatório*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="user", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Digite a senha da conta", font=("Courier New",15)),
+         sg.Text("*Campo obrigatório*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="userPass", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Digite o email usado no cadastro", font=("Courier New",15))],
+        [sg.InputText(key="userEmail", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("A conta é para um site ou aplicativo", font=("Courier New",15))],
+        [sg.Radio("Site", group_id=(1), key="Site", font=("Courier New",15, ["bold"])),
+         sg.Radio("Aplicativo", group_id=(1), key="App", font=("Courier New",15, ["bold"])),
+         sg.Text("*Campo obrigatório*", font=("Courier New",10, ["bold"]) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Nome do site ou do app", font=("Courier New",15)),
+         sg.Text("*Campo obrigatório*", font=("Courier New",10, ["bold"]))],
+        [sg.InputText(key="nome", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Text("Qual o url", font=("Courier New",15))],
+        [sg.InputText(key="Url", font=("Courier New",15) ,pad=((0,0),(0,30)))],
+        
+        [sg.Button("REGISTRAR PERFIL", key="Regis", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
         ]
     janela = sg.Window("GERENCIADOR DE SENHAS",
                        layout)
@@ -98,25 +117,26 @@ def inserir():
             email = valores["userEmail"]
             if valores["Site"] == True:
                 tipo = "Site"
-            else:
+            elif valores["App"] == True:
                 tipo = "App"
+            else:
+                tipo = ""
             nome = valores["nome"]
             url = valores["Url"]
             data = gettime()
             
-            mensagem = vefNull(usuario, senha, nome)
-            if mensagem != "Campos não preenchidos:":
-                sg.popup_auto_close(mensagem,
-                                    no_titlebar=True,
-                                    auto_close=True,
-                                    auto_close_duration=4,
-                                    grab_anywhere=True)
+            mensagem = vefNull(usuario, senha, tipo, nome)
+            if mensagem != "Alguns campos não foram preenchidos:":
+                sg.popup(mensagem,
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
                 continue
-            sucesso = insert_sql(cursor, conexao, usuario, senha, email, tipo, nome, url, data)
-        
+            janela.close()
+            insert_sql(cursor, conexao, usuario, senha, email, tipo, nome, url, data)
+            break
         if evento == sg.WIN_CLOSED:
             break
-
 
 def main():
     lista = atualizar_sql(cursor)
@@ -125,12 +145,16 @@ def main():
         [sg.Table(
             lista,
             headings=hlis,
-            col_widths=[3, 10, 10, 30, 6, 10, 10,21],
-            auto_size_columns=False)],
+            col_widths=[3, 10, 10, 20, 6, 10, 10, 17],
+            auto_size_columns=False,
+            font=("Verdana",13),
+            row_height=35,
+            key="Tabela")
+            ],
         
-        [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo"),
-         sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo"),
-         sg.Button("ADICIONAR NOVO PERFIL", key="delInfo"),]
+        [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo", font=("Avantgarde",15), size=30),
+         sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo", font=("Avantgarde",15), size=30),
+         sg.Button("DELETAR UM PERFIL", key="delInfo",font=("Avantgarde",15), size=25)]
     ]
     
     janela = sg.Window("GERENCIADOR DE SENHAS",
@@ -138,10 +162,17 @@ def main():
     
     
     while True:
+        
+        lista = atualizar_sql(cursor)
         evento, valores = janela.read()
         if evento == "insInfo":
+            janela.hide()
             inserir()
+            lista = atualizar_sql(cursor)
+            janela._Show()
         
+            
+        janela["Tabela"].update(lista)
         if evento == sg.WIN_CLOSED:
             break
 
@@ -154,7 +185,7 @@ conexao = mysql.connector.connect(
     database='estudos',
 )
 cursor = conexao.cursor(buffered=True)
-
+sg.theme("DarkTeal12")
 main()
         
 cursor.close()
