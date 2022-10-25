@@ -1,5 +1,6 @@
 #pip install PySimpleGUI
 #pip install mysql-connector-python
+#pip install pyperclip
 
 import PySimpleGUI as sg
 import mysql.connector
@@ -300,10 +301,10 @@ def deletar():
         
         if evento == sg.WIN_CLOSED:
             break
-        
-        
-        
-    
+
+
+
+
 
 
 
@@ -320,14 +321,16 @@ def main():
             header_font=("Verdana",13, ["bold"]),
             row_height=35,
             alternating_row_color = "",
+            enable_events=True,
             key="Tabela")
             ],
+        
         
         [sg.Button("ADICIONAR NOVO PERFIL", key="insInfo", font=("Avantgarde",15, ["bold"]), size=30),
          sg.Button("ATUALIZAR ALGUMA INFORMAÇÃO", key="attInfo", font=("Avantgarde",15, ["bold"]), size=30),
          sg.Button("DELETAR UM PERFIL", key="delInfo",font=("Avantgarde",15, ["bold"]), size=25)]
     ]
-    
+
     janela = sg.Window("GERENCIADOR DE SENHAS",
                        layout)
     
@@ -336,6 +339,12 @@ def main():
         
         lista = atualizar_sql(cursor)
         evento, valores = janela.read()
+        
+        if evento == "Table":
+            itens = janela[valores["Tabela"]]
+            print(itens)
+            
+        
         if evento == "insInfo":
             janela.hide()
             inserir()
