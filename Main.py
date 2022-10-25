@@ -2,6 +2,7 @@
 #pip install mysql-connector-python
 #pip install pyperclip
 
+import pyperclip
 import PySimpleGUI as sg
 import mysql.connector
 from datetime import datetime
@@ -321,7 +322,7 @@ def main():
             header_font=("Verdana",13, ["bold"]),
             row_height=35,
             alternating_row_color = "",
-            enable_events=True,
+            enable_click_events=True,
             key="Tabela")
             ],
         
@@ -340,9 +341,12 @@ def main():
         lista = atualizar_sql(cursor)
         evento, valores = janela.read()
         
-        if evento == "Table":
-            itens = janela[valores["Tabela"]]
-            print(itens)
+        if isinstance(evento, tuple) and evento[:2] == ("Tabela","+CLICKED+"):
+            row, col = position = evento[2]
+            if None not in position and row >= 0:
+                texto = lista[row][col]
+                print(texto)
+                pyperclip.copy(texto)
             
         
         if evento == "insInfo":
