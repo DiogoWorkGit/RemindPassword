@@ -1,8 +1,6 @@
 #pip install PySimpleGUI
 #pip install mysql-connector-python
 
-from email.policy import default
-from termios import VLNEXT
 import PySimpleGUI as sg
 import mysql.connector
 from datetime import datetime
@@ -225,7 +223,6 @@ def alterar():
             if result == None:
                 continue
             
-            print(result)
             usuarioTxt = result[0]
             senhaTxt = result[1]
             emailTxt = result[2]
@@ -268,6 +265,48 @@ def alterar():
         if evento == sg.WIN_CLOSED:
             break
 
+def deletar():
+    layout = [
+        [sg.Text("Digite o id do registro que será deletado", font=("Courier New",15)),
+         sg.Text("*Campo obrigatório*", font=("Courier New",10, ["bold"]))],
+        
+        [sg.InputText(key="id", font=("Courier New",15) ,pad=((0,0),(0,30)), size=15), sg.Button("DELETAR REGISTRO", key="Delet", font=("Avantgarde",15), size=40 ,pad=((5,0),(0,30)))]
+    ]
+    
+    janela = sg.Window("GERENCIADOR DE SENHAS",
+                       layout)
+    
+    while True:
+        evento, valores = janela.read()
+        if evento == "Delet":
+            confirmar = sg.popup_ok_cancel("Tem certeza que quer deletar esse registro?",
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
+            if confirmar != "OK":
+                continue
+            id = valores["id"]
+            try:
+                id = int(id)
+            except:
+                sg.popup("Esse Id não é um valor numérico",
+                    no_titlebar=True,
+                    grab_anywhere=True,
+                    font=("Courier New",15))
+                continue
+            delet_sql(id)
+            janela["id"].update("")
+            
+        
+        if evento == sg.WIN_CLOSED:
+            break
+        
+        
+        
+    
+
+
+
 def main():
     lista = atualizar_sql(cursor)
     hlis = ["ID", "USUÁRIO", "SENHA", "EMAIL", "ONDE", "NOME", "URL", "DATA DE CRIAÇÃO"]
@@ -307,6 +346,13 @@ def main():
         if evento == "attInfo":
             janela.hide()
             alterar()
+            lista = atualizar_sql(cursor)
+            janela["Tabela"].update(lista)
+            janela._Show()
+        
+        if evento == "delInfo":
+            janela.hide()
+            deletar()
             lista = atualizar_sql(cursor)
             janela["Tabela"].update(lista)
             janela._Show()
