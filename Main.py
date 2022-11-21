@@ -305,10 +305,6 @@ def deletar():
 
 
 
-
-
-
-
 def main():
     lista = atualizar_sql(cursor)
     hlis = ["ID", "USUÁRIO", "SENHA", "EMAIL", "ONDE", "NOME", "URL", "DATA DE CRIAÇÃO"]
@@ -341,12 +337,12 @@ def main():
         lista = atualizar_sql(cursor)
         evento, valores = janela.read()
         
-        if isinstance(evento, tuple) and evento[:2] == ("Tabela","+CLICKED+"):
-            row, col = position = evento[2]
-            if None not in position and row >= 0:
-                texto = lista[row][col]
-                print(texto)
-                pyperclip.copy(texto)
+        #if isinstance(evento, tuple) and evento[:2] == ("Tabela","+CLICKED+"):
+        #    row, col = position = evento[2]
+        #    if None not in position and row >= 0:
+        #        texto = lista[row][col]
+        #        print(texto)
+        #        pyperclip.copy(texto)
             
         
         if evento == "insInfo":
@@ -382,6 +378,7 @@ conexao = mysql.connector.connect(
     database='estudos',
 )
 cursor = conexao.cursor(buffered=True)
+
 sg.theme("DarkTeal12")
 main()
         
