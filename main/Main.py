@@ -6,7 +6,6 @@ import pyperclip
 import PySimpleGUI as sg
 import mysql.connector
 from datetime import datetime
-from hashlib import md5 
 
 def mask_list(lista: list):
     copylist = lista
@@ -158,7 +157,7 @@ def inserir():
         
         [sg.Button("REGISTRAR PERFIL", key="Regis", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
         ]
-    janela = sg.Window("GERENCIADOR DE SENHAS",
+    janela = sg.Window("RemindPassword",
                        layout)
     while True:
         evento, valores = janela.read()
@@ -228,7 +227,7 @@ def alterar():
         #Botão para realizar a alteração do registro no banco de dados
         [sg.Button("ALTERAR REGISTRO DO PERFIL", key="alte", font=("Avantgarde",15), size=48 ,pad=((0,0),(30,0)))],
         ]
-    janela = sg.Window("GERENCIADOR DE SENHAS",
+    janela = sg.Window("RemindPassword",
                        layout)
     while True:
         evento, valores = janela.read()
@@ -297,7 +296,7 @@ def deletar():
         [sg.InputText(key="id", font=("Courier New",15) ,pad=((0,0),(0,30)), size=15), sg.Button("DELETAR REGISTRO", key="Delet", font=("Avantgarde",15), size=40 ,pad=((5,0),(0,30)))]
     ]
     
-    janela = sg.Window("GERENCIADOR DE SENHAS",
+    janela = sg.Window("RemindPassword",
                        layout)
     
     while True:
@@ -326,7 +325,6 @@ def deletar():
             break
 
 
-
 def main():
     lista = atualizar_sql(cursor)
     copylist = mask_list(lista)
@@ -351,7 +349,7 @@ def main():
          sg.Button("DELETAR UM PERFIL", key="delInfo",font=("Avantgarde",15, ["bold"]), size=25)]
     ]
 
-    janela = sg.Window("GERENCIADOR DE SENHAS",
+    janela = sg.Window("RemindPassword",
                        layout)
     
     
@@ -364,28 +362,31 @@ def main():
             row, col = position = evento[2]
             if None not in position and row >= 0:
                 texto = lista[row][col]
-                print(texto)
+                pyperclip.copy(texto)
             
         
         if evento == "insInfo":
             janela.hide()
             inserir()
             lista = atualizar_sql(cursor)
-            janela["Tabela"].update(lista)
+            copylist = mask_list(lista)
+            janela["Tabela"].update(copylist)
             janela._Show()
         
         if evento == "attInfo":
             janela.hide()
             alterar()
             lista = atualizar_sql(cursor)
-            janela["Tabela"].update(lista)
+            copylist = mask_list(lista)
+            janela["Tabela"].update(copylist)
             janela._Show()
         
         if evento == "delInfo":
             janela.hide()
             deletar()
             lista = atualizar_sql(cursor)
-            janela["Tabela"].update(lista)
+            copylist = mask_list(lista)
+            janela["Tabela"].update(copylist)
             janela._Show()
         
         if evento == sg.WIN_CLOSED:
