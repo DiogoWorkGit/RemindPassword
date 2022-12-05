@@ -6,6 +6,28 @@ import pyperclip
 import PySimpleGUI as sg
 import mysql.connector
 from datetime import datetime
+from hashlib import md5 
+
+def mask_list(lista: list):
+    copylist = lista
+    lista_mask: list = []
+    for y in range(len(lista)):
+        print(copylist[0][2])
+        print(copylist[1][2])
+        x = copylist[y][2]
+        chars = []
+        for i in x:
+            chars.append(i)
+        for u in range(len(chars)):
+            chars[u] = "*"
+        texto = "".join(chars)
+        lista_mask.append(texto)
+        texto = ""
+    
+    for y in range(len(lista)):
+        lista[y][2] = lista_mask[y]
+    
+    return(lista)
 
 def atualizar_sql(cursor):
     sql = f'SELECT * FROM gensen;'
@@ -307,10 +329,11 @@ def deletar():
 
 def main():
     lista = atualizar_sql(cursor)
+    copylist = mask_list(lista)
     hlis = ["ID", "USUÁRIO", "SENHA", "EMAIL", "ONDE", "NOME", "URL", "DATA DE CRIAÇÃO"]
     layout = [
         [sg.Table(
-            lista,
+            copylist,
             headings=hlis,
             col_widths=[3, 10, 15, 20, 6, 10, 10, 17],
             auto_size_columns=False,
@@ -337,12 +360,11 @@ def main():
         lista = atualizar_sql(cursor)
         evento, valores = janela.read()
         
-        #if isinstance(evento, tuple) and evento[:2] == ("Tabela","+CLICKED+"):
-        #    row, col = position = evento[2]
-        #    if None not in position and row >= 0:
-        #        texto = lista[row][col]
-        #        print(texto)
-        #        pyperclip.copy(texto)
+        if isinstance(evento, tuple) and evento[:2] == ("Tabela","+CLICKED+"):
+            row, col = position = evento[2]
+            if None not in position and row >= 0:
+                texto = lista[row][col]
+                print(texto)
             
         
         if evento == "insInfo":
@@ -371,17 +393,20 @@ def main():
 
 
 #Inicio do código
-conexao = mysql.connector.connect(
-    host='localhost',
-    user='root',
-    password='',
-    database='estudos',
-)
-cursor = conexao.cursor(buffered=True)
 
-sg.theme("DarkTeal12")
-main()
-        
-cursor.close()
-conexao.close()
-#Término
+if __name__ == "__main__":
+
+    conexao = mysql.connector.connect(
+        host='localhost',
+        user='root',
+        password='',
+        database='estudos',
+    )
+    cursor = conexao.cursor(buffered=True)
+
+    sg.theme("DarkTeal12")
+    main()
+
+    cursor.close()
+    conexao.close()
+    #Término
