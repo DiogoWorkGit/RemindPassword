@@ -11,8 +11,6 @@ def mask_list(lista: list):
     copylist = lista
     lista_mask: list = []
     for y in range(len(lista)):
-        print(copylist[0][2])
-        print(copylist[1][2])
         x = copylist[y][2]
         chars = []
         for i in x:
@@ -27,6 +25,19 @@ def mask_list(lista: list):
         lista[y][2] = lista_mask[y]
     
     return(lista)
+
+def aviso(texto: str):
+    sg.popup(f"{texto}",
+        no_titlebar=True,
+        grab_anywhere=True,
+        font=("Courier New",15))
+
+def fechar_janela(texto: str):
+    valor = sg.popup_ok_cancel(f"{texto}",
+        no_titlebar=True,
+        grab_anywhere=True,
+        font=("Courier New",15))
+    return valor
 
 def atualizar_sql(cursor):
     sql = f'SELECT * FROM gensen;'
@@ -259,6 +270,9 @@ def alterar():
             janela["Url"].update(f"{urlTxt}")
             
         if evento == "alte":
+            if valores["id"] == "":
+                aviso("Coloque o id antes para atualizar alguma informação.") 
+            
             usuario = valores["user"]
             senha = valores["userPass"]
             email = valores["userEmail"]
@@ -390,7 +404,11 @@ def main():
             janela._Show()
         
         if evento == sg.WIN_CLOSED:
-            break
+            fechar = fechar_janela("Fechar a janela?")
+            if fechar == "OK":
+                break
+            else:
+                janela._Show()
 
 
 #Inicio do código
